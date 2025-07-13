@@ -34,7 +34,7 @@ def index():
         def draw_centered_multiline(lines, box, font):
             if isinstance(lines, str):
                 lines = lines.split('\n')
-            line_height = int(get_text_size('A', font)[1] * 1.3)
+            line_height = int(get_text_size('A', font)[1] * 1.5)  # was 1.3, now 1.5
             total_height = line_height * len(lines)
             y = box[1] + (box[3] - box[1] - total_height) / 2
             for line in lines:
@@ -136,7 +136,7 @@ def index():
             draw.text((cell_pad_x, y), line, font=font_regular, fill='black')
             y += line_height_regular
         y += 4  # space before pincode
-        draw.text((cell_pad_x, y), pincode_text, font=font_small, fill='black')
+        draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')  # use font_regular, not font_small
 
         # Draw return address
         y = header_height + cell_pad_y
