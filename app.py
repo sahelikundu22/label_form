@@ -62,6 +62,18 @@ def index():
                 wrapped.append(current)
             return wrapped
 
+        def draw_centered_header(text, box, font):
+            # If text is too wide, reduce font size or wrap
+            w, _ = get_text_size(text, font)
+            max_width = box[2] - box[0] - 4  # 4px padding
+            if w > max_width:
+                # Try wrapping
+                import textwrap
+                lines = textwrap.wrap(text, width=18)  # Adjust width as needed
+                draw_centered_multiline(lines, box, font)
+            else:
+                draw_centered_multiline(text, box, font)
+
         # Image setup
         img_width = 400
         cell_pad_x = 8
@@ -115,8 +127,8 @@ def index():
         draw.rectangle([img_width//2, top_box_height + barcode_section_height, img_width, img_height], outline='black', width=2)
 
         # Section headers
-        draw_centered_multiline("Customer Address", [0, 0, img_width//2, header_height], font_bold)
-        draw_centered_multiline("If Undelivered, Return to", [img_width//2, 0, img_width, header_height], font_bold)
+        draw_centered_header("Customer Address", [0, 0, img_width//2, header_height], font_bold)
+        draw_centered_header("If Undelivered, Return to", [img_width//2, 0, img_width, header_height], font_bold)
 
         # Draw customer address lines
         y = header_height + cell_pad_y
@@ -139,11 +151,11 @@ def index():
         img.paste(barcode_img.resize((barcode_w, barcode_height)), (barcode_x, barcode_y))
 
         # Bottom left: Amount
-        draw_centered_multiline("Amount to be collected", [0, top_box_height + barcode_section_height, img_width//2, top_box_height + barcode_section_height + header_height], font_bold)
+        draw_centered_header("Amount to be collected", [0, top_box_height + barcode_section_height, img_width//2, top_box_height + barcode_section_height + header_height], font_bold)
         draw_centered_multiline(amount_text, [0, top_box_height + barcode_section_height + header_height, img_width//2, img_height], font_regular)
 
         # Bottom right: Destination Hub
-        draw_centered_multiline("Destination Hub", [img_width//2, top_box_height + barcode_section_height, img_width, top_box_height + barcode_section_height + header_height], font_bold)
+        draw_centered_header("Destination Hub", [img_width//2, top_box_height + barcode_section_height, img_width, top_box_height + barcode_section_height + header_height], font_bold)
         draw_centered_multiline(hub_text, [img_width//2, top_box_height + barcode_section_height + header_height, img_width, img_height], font_regular)
 
         # Save to buffer
