@@ -17,7 +17,7 @@ def index():
         barcode_writer.set_options({'write_text': False})
         barcode_img = CODE128(data['barcode_number'], writer=barcode_writer).render()
 
-        # Try to load Times font, fallback to DejaVuSans if not available
+        # Try to load Times font, fallback to DejaVuSans
         try:
             font_regular = ImageFont.truetype("fonts/times.ttf", 16)
             font_bold = ImageFont.truetype("fonts/timesbd.ttf", 16)
@@ -34,7 +34,8 @@ def index():
         def draw_centered_multiline(lines, box, font):
             if isinstance(lines, str):
                 lines = lines.split('\n')
-            line_height = int(get_text_size('A', font)[1] * 1.7)  # Try 1.7 or 2.0
+            ascent, descent = font.getmetrics()
+            line_height = ascent + descent + 4
             total_height = line_height * len(lines)
             y = box[1] + (box[3] - box[1] - total_height) / 2
             for line in lines:
@@ -63,13 +64,11 @@ def index():
             return wrapped
 
         def draw_centered_header(text, box, font):
-            # If text is too wide, reduce font size or wrap
             w, _ = get_text_size(text, font)
-            max_width = box[2] - box[0] - 4  # 4px padding
+            max_width = box[2] - box[0] - 4
             if w > max_width:
-                # Try wrapping
                 import textwrap
-                lines = textwrap.wrap(text, width=18)  # Adjust width as needed
+                lines = textwrap.wrap(text, width=18)
                 draw_centered_multiline(lines, box, font)
             else:
                 draw_centered_multiline(text, box, font)
@@ -78,25 +77,25 @@ def index():
         img_width = 400
         cell_pad_x = 8
         cell_pad_y = 6
-
         col_width = (img_width // 2) - 2 * cell_pad_x
 
-        # Customer Address
+        # Prepare text and wrap
         address_text_main = f"{data['customer_name']}\n{data['customer_address']}"
         address_lines = wrap_multiline_text(address_text_main, font_regular, col_width)
         pincode_text = data['pincode']
-
-        # Return Address
         return_text = f"{data['return_address']}\n{data['return_pincode']}"
         return_lines = wrap_multiline_text(return_text, font_regular, col_width)
 
-        # Line Heights
-        line_height_regular = int(get_text_size('A', font_regular)[1] * 1.3)
-        line_height_bold = int(get_text_size('A', font_bold)[1] * 1.3)
-        line_height_small = int(get_text_size('A', font_small)[1] * 1.3)
+        # Line heights
+        ascent_r, descent_r = font_regular.getmetrics()
+        ascent_b, descent_b = font_bold.getmetrics()
+        ascent_s, descent_s = font_small.getmetrics()
+        line_height_regular = ascent_r + descent_r + 4
+        line_height_bold = ascent_b + descent_b + 4
+        line_height_small = ascent_s + descent_s + 2
         header_height = line_height_bold + 2 * cell_pad_y
 
-        # Top box height dynamically
+        # Dynamic top box height
         total_address_height = len(address_lines) * line_height_regular + line_height_small + 2 * cell_pad_y + 4
         return_height = len(return_lines) * line_height_regular + 2 * cell_pad_y
         top_box_height = max(header_height + total_address_height, header_height + return_height)
@@ -106,7 +105,7 @@ def index():
         barcode_num_height = get_text_size(data['barcode_number'], font_bold)[1]
         barcode_section_height = barcode_height + barcode_num_height + 20
 
-        # Bottom section height dynamically
+        # Bottom section height
         amount_text = str(data['amount'])
         hub_text = data['destination_hub']
         amount_lines = wrap_multiline_text(amount_text, font_regular, col_width)
@@ -114,12 +113,12 @@ def index():
         bottom_lines = max(len(amount_lines), len(hub_lines))
         bottom_box_height = header_height + bottom_lines * line_height_regular + 2 * cell_pad_y
 
-        # Total image height
+        # Total image size
         img_height = int(top_box_height + barcode_section_height + bottom_box_height)
         img = Image.new('RGB', (img_width, img_height), 'white')
         draw = ImageDraw.Draw(img)
 
-        # Draw section boxes
+        # Draw boxes
         draw.rectangle([0, 0, img_width//2, top_box_height], outline='black', width=2)
         draw.rectangle([img_width//2, 0, img_width, top_box_height], outline='black', width=2)
         draw.rectangle([0, top_box_height, img_width, top_box_height + barcode_section_height], outline='black', width=2)
@@ -130,13 +129,13 @@ def index():
         draw_centered_header("Customer Address", [0, 0, img_width//2, header_height], font_bold)
         draw_centered_header("If Undelivered, Return to", [img_width//2, 0, img_width, header_height], font_bold)
 
-        # Draw customer address lines
+        # Draw customer address
         y = header_height + cell_pad_y
         for line in address_lines:
             draw.text((cell_pad_x, y), line, font=font_regular, fill='black')
             y += line_height_regular
-        y += 4  # space before pincode
-        draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')  # use font_regular, not font_small
+        y += 4
+        draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')
 
         # Draw return address
         y = header_height + cell_pad_y
@@ -158,7 +157,7 @@ def index():
         draw_centered_header("Destination Hub", [img_width//2, top_box_height + barcode_section_height, img_width, top_box_height + barcode_section_height + header_height], font_bold)
         draw_centered_multiline(hub_text, [img_width//2, top_box_height + barcode_section_height + header_height, img_width, img_height], font_regular)
 
-        # Save to buffer
+        # Save image to file
         buf = io.BytesIO()
         img.save(buf, format='PNG')
         buf.seek(0)
