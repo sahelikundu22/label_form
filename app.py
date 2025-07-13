@@ -80,10 +80,12 @@ def index():
         col_width = (img_width // 2) - 2 * cell_pad_x
 
         # Prepare text and wrap
-        address_text_main = f"{data['customer_name']}\n{data['customer_address']}"
+        # address_text_main = f"{data['customer_name']}\n{data['customer_address']}"
+        address_text_main = f"{data['customer_address']}"
         address_lines = wrap_multiline_text(address_text_main, font_regular, col_width)
-        pincode_text = data['pincode']
-        return_text = f"{data['return_address']}\n{data['return_pincode']}"
+        # pincode_text = data['pincode']
+        # return_text = f"{data['return_address']}\n{data['return_pincode']}"
+        return_text = f"{data['return_address']}"
         return_lines = wrap_multiline_text(return_text, font_regular, col_width)
 
         # Line heights
@@ -135,7 +137,7 @@ def index():
             draw.text((cell_pad_x, y), line, font=font_regular, fill='black')
             y += line_height_regular
         y += 4
-        draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')
+        # draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')
 
         # Draw return address
         y = header_height + cell_pad_y
