@@ -19,9 +19,9 @@ def index():
 
         # Try to load Times font, fallback to DejaVuSans if not available
         try:
-            font_regular = ImageFont.truetype("times.ttf", 16)
-            font_bold = ImageFont.truetype("timesbd.ttf", 16)
-            font_small = ImageFont.truetype("times.ttf", 13)
+            font_regular = ImageFont.truetype("fonts/times.ttf", 16)
+            font_bold = ImageFont.truetype("fonts/timesbd.ttf", 16)
+            font_small = ImageFont.truetype("fonts/times.ttf", 13)
         except OSError:
             font_regular = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
             font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
