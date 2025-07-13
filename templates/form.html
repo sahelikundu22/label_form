@@ -1,28 +1,114 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Shipping Label Generator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+            min-height: 100vh;
+        }
+        .label-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 2rem 1.2rem 2rem 1.2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            max-width: 540px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 576px) {
+            .label-card {
+                padding: 2rem 2.5rem 2.5rem 2.5rem;
+            }
+        }
+        h2 {
+            font-weight: 700;
+            color: #3730a3;
+            letter-spacing: 1px;
+        }
+        .btn-primary {
+            background: #6366f1;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+        .img-fluid {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background: #f3f4f6;
+            max-width: 100%;
+            height: auto;
+        }
+        label {
+            font-weight: 500;
+            color: #3730a3;
+        }
+        .form-control {
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+        }
+        @media (max-width: 400px) {
+            .label-card {
+                padding: 1rem 0.3rem 1.2rem 0.3rem;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 </head>
-<body class="container mt-5">
-    <h2>Shipping Label Generator</h2>
-    <form method="post">
-        <div class="mb-3"><input class="form-control" name="customer_name" placeholder="Customer Name" required></div>
-        <div class="mb-3"><textarea class="form-control" name="customer_address" placeholder="Customer Address" rows="3" required></textarea></div>
-        <div class="mb-3"><input class="form-control" name="pincode" placeholder="Pincode" required></div>
-        <div class="mb-3"><textarea class="form-control" name="return_address" placeholder="Return Address" rows="3" required></textarea></div>
-        <div class="mb-3"><input class="form-control" name="return_pincode" placeholder="Return Pincode" required></div>
-        <div class="mb-3"><input class="form-control" name="amount" placeholder="Amount to be collected" required></div>
-        <div class="mb-3"><input class="form-control" name="destination_hub" placeholder="Destination Hub" required></div>
-        <div class="mb-3"><input class="form-control" name="barcode_number" placeholder="Barcode Number" required></div>
-        <button class="btn btn-primary" type="submit">Generate Label</button>
-    </form>
-    {% if label_url %}
-    <div class="mt-4">
-        <h4>Your Label:</h4>
-        <img src="{{ label_url }}" class="img-fluid" alt="Shipping Label">
-        <a href="{{ label_url }}" download="shipping_label.png" class="btn btn-success mt-2">Download Label</a>
+<body>
+    <div class="label-card">
+        <h2 class="text-center mb-4">Shipping Label Generator</h2>
+        <form method="post">
+            <div class="mb-3">
+                <label for="customer_name">Customer Name</label>
+                <input class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name" required>
+            </div>
+            <div class="mb-3">
+                <label for="customer_address">Customer Address</label>
+                <textarea class="form-control" name="customer_address" id="customer_address" placeholder="Customer Address" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="pincode">Pincode</label>
+                <input class="form-control" name="pincode" id="pincode" placeholder="Pincode" required>
+            </div>
+            <div class="mb-3">
+                <label for="return_address">Return Address</label>
+                <textarea class="form-control" name="return_address" id="return_address" placeholder="Return Address" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="return_pincode">Return Pincode</label>
+                <input class="form-control" name="return_pincode" id="return_pincode" placeholder="Return Pincode" required>
+            </div>
+            <div class="mb-3">
+                <label for="amount">Amount to be collected</label>
+                <input class="form-control" name="amount" id="amount" placeholder="Amount to be collected" required>
+            </div>
+            <div class="mb-3">
+                <label for="destination_hub">Destination Hub</label>
+                <input class="form-control" name="destination_hub" id="destination_hub" placeholder="Destination Hub" required>
+            </div>
+            <div class="mb-3">
+                <label for="barcode_number">Barcode Number</label>
+                <input class="form-control" name="barcode_number" id="barcode_number" placeholder="Barcode Number" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Generate Label</button>
+        </form>
+        {% if label_url %}
+        <div class="mt-4 text-center">
+            <h4 class="mb-3">Your Label:</h4>
+            <img src="{{ label_url }}" class="img-fluid mb-2" alt="Shipping Label">
+            <br>
+            <a href="{{ label_url }}" download="shipping_label.png" class="btn btn-success mt-2">Download Label</a>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
 </body>
 </html> 
