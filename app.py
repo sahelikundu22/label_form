@@ -34,7 +34,7 @@ def index():
         def draw_centered_multiline(lines, box, font):
             if isinstance(lines, str):
                 lines = lines.split('\n')
-            line_height = int(get_text_size('A', font)[1] * 1.5)  # was 1.3, now 1.5
+            line_height = int(get_text_size('A', font)[1] * 1.7)  # Try 1.7 or 2.0
             total_height = line_height * len(lines)
             y = box[1] + (box[3] - box[1] - total_height) / 2
             for line in lines:
