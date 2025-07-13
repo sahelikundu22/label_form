@@ -17,10 +17,15 @@ def index():
         barcode_writer.set_options({'write_text': False})
         barcode_img = CODE128(data['barcode_number'], writer=barcode_writer).render()
 
-        # Load fonts
-        font_regular = ImageFont.truetype("times.ttf", 16)
-        font_bold = ImageFont.truetype("timesbd.ttf", 16)
-        font_small = ImageFont.truetype("times.ttf", 13)
+        # Try to load Times font, fallback to DejaVuSans if not available
+        try:
+            font_regular = ImageFont.truetype("times.ttf", 16)
+            font_bold = ImageFont.truetype("timesbd.ttf", 16)
+            font_small = ImageFont.truetype("times.ttf", 13)
+        except OSError:
+            font_regular = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 16)
+            font_bold = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
+            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 13)
 
         def get_text_size(text, font):
             bbox = font.getbbox(text)
@@ -61,6 +66,7 @@ def index():
         img_width = 400
         cell_pad_x = 8
         cell_pad_y = 6
+
         col_width = (img_width // 2) - 2 * cell_pad_x
 
         # Customer Address
