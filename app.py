@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, session
 from PIL import Image, ImageDraw, ImageFont
 import barcode
 from barcode.writer import ImageWriter
@@ -6,12 +6,16 @@ import io
 import os
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key_here'  # Needed for session
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     label_url = None
+    form_data = {}
     if request.method == 'POST':
         data = {k: request.form[k] for k in request.form}
+        session['form_data'] = data
+        form_data = data
         CODE128 = barcode.get_barcode_class('code128')
         barcode_writer = ImageWriter()
         barcode_writer.set_options({'write_text': False})
@@ -80,12 +84,10 @@ def index():
         col_width = (img_width // 2) - 2 * cell_pad_x
 
         # Prepare text and wrap
-        # address_text_main = f"{data['customer_name']}\n{data['customer_address']}"
-        address_text_main = f"{data['customer_address']}"
+        address_text_main = f"{data['customer_name']}\n{data['customer_address']}"
         address_lines = wrap_multiline_text(address_text_main, font_regular, col_width)
-        # pincode_text = data['pincode']
-        # return_text = f"{data['return_address']}\n{data['return_pincode']}"
-        return_text = f"{data['return_address']}"
+        pincode_text = data['pincode']
+        return_text = f"{data['return_address']}\n{data['return_pincode']}"
         return_lines = wrap_multiline_text(return_text, font_regular, col_width)
 
         # Line heights
@@ -137,7 +139,7 @@ def index():
             draw.text((cell_pad_x, y), line, font=font_regular, fill='black')
             y += line_height_regular
         y += 4
-        # draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')
+        draw.text((cell_pad_x, y), pincode_text, font=font_regular, fill='black')
 
         # Draw return address
         y = header_height + cell_pad_y
@@ -167,8 +169,9 @@ def index():
         with open(label_path, 'wb') as f:
             f.write(buf.getbuffer())
         label_url = url_for('static', filename='shipping_label.png')
-
-    return render_template('form.html', label_url=label_url)
+    else:
+        form_data = session.get('form_data', {})
+    return render_template('form.html', label_url=label_url, form_data=form_data)
 
 if __name__ == '__main__':
     if not os.path.exists('static'):

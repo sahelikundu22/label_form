@@ -75,37 +75,37 @@
     <div class="label-card">
         <h2 class="text-center mb-4">Shipping Label Generator</h2>
         <form method="post">
-            <!-- <div class="mb-3">
+            <div class="mb-3">
                 <label for="customer_name">Customer Name</label>
-                <input class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name" required>
-            </div> -->
+                <input class="form-control" name="customer_name" id="customer_name" placeholder="Customer Name" required value="{{ form_data.get('customer_name', '') }}">
+            </div>
             <div class="mb-3">
                 <label for="customer_address">Customer Address</label>
-                <textarea class="form-control" name="customer_address" id="customer_address" placeholder="Customer Address" rows="3" required></textarea>
+                <textarea class="form-control" name="customer_address" id="customer_address" placeholder="Customer Address" rows="3" required>{{ form_data.get('customer_address', '') }}</textarea>
             </div>
-            <!-- <div class="mb-3">
+            <div class="mb-3">
                 <label for="pincode">Pincode</label>
-                <input class="form-control" name="pincode" id="pincode" placeholder="Pincode" required>
-            </div> -->
+                <input class="form-control" name="pincode" id="pincode" placeholder="Pincode" required value="{{ form_data.get('pincode', '') }}">
+            </div>
             <div class="mb-3">
                 <label for="return_address">Return Address</label>
-                <textarea class="form-control" name="return_address" id="return_address" placeholder="Return Address" rows="3" required></textarea>
+                <textarea class="form-control" name="return_address" id="return_address" placeholder="Return Address" rows="3" required>{{ form_data.get('return_address', '') }}</textarea>
             </div>
-            <!-- <div class="mb-3">
+            <div class="mb-3">
                 <label for="return_pincode">Return Pincode</label>
-                <input class="form-control" name="return_pincode" id="return_pincode" placeholder="Return Pincode" required>
-            </div> -->
+                <input class="form-control" name="return_pincode" id="return_pincode" placeholder="Return Pincode" required value="{{ form_data.get('return_pincode', '') }}">
+            </div>
             <div class="mb-3">
                 <label for="amount">Amount to be collected</label>
-                <input class="form-control" name="amount" id="amount" placeholder="Amount to be collected" required>
+                <input class="form-control" name="amount" id="amount" placeholder="Amount to be collected" required value="{{ form_data.get('amount', '') }}">
             </div>
             <div class="mb-3">
                 <label for="destination_hub">Destination Hub</label>
-                <input class="form-control" name="destination_hub" id="destination_hub" placeholder="Destination Hub" required>
+                <input class="form-control" name="destination_hub" id="destination_hub" placeholder="Destination Hub" required value="{{ form_data.get('destination_hub', '') }}">
             </div>
             <div class="mb-3">
                 <label for="barcode_number">Barcode Number</label>
-                <input class="form-control" name="barcode_number" id="barcode_number" placeholder="Barcode Number" required>
+                <input class="form-control" name="barcode_number" id="barcode_number" placeholder="Barcode Number" required value="{{ form_data.get('barcode_number', '') }}">
             </div>
             <button class="btn btn-primary w-100" type="submit">Generate Label</button>
         </form>
@@ -115,6 +115,9 @@
             <img src="{{ label_url }}" class="img-fluid mb-2" alt="Shipping Label">
             <br>
             <a href="{{ label_url }}" download="shipping_label.png" class="btn btn-success mt-2">Download Label</a>
+            <form method="get" class="mt-2">
+                <button class="btn btn-secondary" type="submit">Edit</button>
+            </form>
         </div>
         {% endif %}
     </div>
