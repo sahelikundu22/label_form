@@ -18,8 +18,11 @@ def index():
         form_data = data
         CODE128 = barcode.get_barcode_class('code128')
         barcode_writer = ImageWriter()
-        barcode_writer.set_options({'write_text': False})
-        barcode_img = CODE128(data['barcode_number'], writer=barcode_writer).render()
+        # Ensure the barcode number is not rendered in the image
+        barcode_img = CODE128(
+            data['barcode_number'],
+            writer=barcode_writer
+        ).render(writer_options={'write_text': False, 'quiet_zone': 0})
 
         # Try to load Times font, fallback to DejaVuSans
         try:
@@ -69,13 +72,16 @@ def index():
 
         def draw_centered_header(text, box, font):
             w, _ = get_text_size(text, font)
-            max_width = box[2] - box[0] - 4
+            header_side_margin = 6  # Thin margin on both sides
+            max_width = box[2] - box[0] - 2 * header_side_margin
             if w > max_width:
                 import textwrap
                 lines = textwrap.wrap(text, width=18)
                 draw_centered_multiline(lines, box, font)
             else:
-                draw_centered_multiline(text, box, font)
+                # Shift the text right by header_side_margin for left margin
+                shifted_box = [box[0] + header_side_margin, box[1], box[2] - header_side_margin, box[3]]
+                draw_centered_multiline(text, shifted_box, font)
 
         # Image setup
         img_width = 400
@@ -105,9 +111,17 @@ def index():
         top_box_height = max(header_height + total_address_height, header_height + return_height)
 
         # Barcode section
-        barcode_height = 60
-        barcode_num_height = get_text_size(data['barcode_number'], font_bold)[1]
-        barcode_section_height = barcode_height + barcode_num_height + 20
+        barcode_height = 45  # Shorter height for a slim barcode
+        barcode_padding = 29  # or 30 for even more space
+        barcode_x = barcode_padding
+        barcode_w = img_width - 2 * barcode_padding
+        barcode_y = top_box_height + 10  # Padding from top
+        barcode_img_resized = barcode_img.resize((barcode_w, barcode_height))
+        
+        # Calculate barcode number text size for section height
+        barcode_num_text = data['barcode_number']
+        barcode_num_width, barcode_num_height = get_text_size(barcode_num_text, font_bold)
+        barcode_section_height = barcode_height + barcode_num_height + 20  # Adjusted for new height
 
         # Bottom section height
         amount_text = str(data['amount'])
@@ -147,12 +161,6 @@ def index():
             draw.text((img_width//2 + cell_pad_x, y), line, font=font_regular, fill='black')
             y += line_height_regular
 
-        # Draw barcode
-        barcode_w = img_width - 40
-        barcode_x = 20
-        barcode_y = top_box_height + 5
-        img.paste(barcode_img.resize((barcode_w, barcode_height)), (barcode_x, barcode_y))
-
         # Bottom left: Amount
         draw_centered_header("Amount to be collected", [0, top_box_height + barcode_section_height, img_width//2, top_box_height + barcode_section_height + header_height], font_bold)
         draw_centered_multiline(amount_text, [0, top_box_height + barcode_section_height + header_height, img_width//2, img_height], font_regular)
@@ -160,6 +168,13 @@ def index():
         # Bottom right: Destination Hub
         draw_centered_header("Destination Hub", [img_width//2, top_box_height + barcode_section_height, img_width, top_box_height + barcode_section_height + header_height], font_bold)
         draw_centered_multiline(hub_text, [img_width//2, top_box_height + barcode_section_height + header_height, img_width, img_height], font_regular)
+
+        # Draw barcode
+        img.paste(barcode_img_resized, (barcode_x, barcode_y))
+        # Draw barcode number centered below barcode
+        barcode_num_x = (img_width - barcode_num_width) // 2
+        barcode_num_y = barcode_y + barcode_height + 2  # 2px padding below barcode
+        draw.text((barcode_num_x, barcode_num_y), barcode_num_text, font=font_bold, fill='black')
 
         # Save image to file
         buf = io.BytesIO()
